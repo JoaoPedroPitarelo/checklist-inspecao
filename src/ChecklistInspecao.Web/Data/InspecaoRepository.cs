@@ -1,3 +1,4 @@
+using ChecklistInspecao.Web.Models;
 using Dapper;
 using Npgsql;
 
@@ -61,5 +62,60 @@ public class InspecaoRepository
 
         await tx.CommitAsync();
         return inspecaoId;
+    }
+
+    public async Task<InspecaoDetalhe?> ObterAsync(int id, int[] regiaoIds)
+    {
+        const string sqlInspecao = """
+            SELECT i.id,
+                l.numero AS loja_numero,
+                l.nome AS loja_nome,
+                r.nome AS regiao_nome,
+                i.gerente_nome,
+                i.autor_id,
+                a.nome AS autor_nome,
+                i.data_visita,
+                i.observacao,
+                i.status,
+                i.percentual,
+                i.criado_em,
+                i.modificado_em,
+                m.nome AS modificado_por_nome
+            FROM inspecao i
+                JOIN loja    l ON l.id = i.loja_id
+                JOIN regiao  r ON r.id = i.regiao_id
+                JOIN usuario a ON a.id = i.autor_id
+                LEFT JOIN usuario m ON m.id = i.modificado_por
+            WHERE i.id = @Id
+                AND i.regiao_id = ANY(@RegiaoIds)
+        """;
+
+        const string sqlItens = """
+            SELECT id,
+                categoria_nome,
+                categoria_ordem,
+                item_nome,
+                item_descricao,
+                item_ordem,
+                resposta,
+                observacao
+            FROM inspecao_item
+                WHERE inspecao_id = @Id
+            ORDER BY categoria_ordem, item_ordem
+        """;
+
+        await using var conn = await _dataSource.OpenConnectionAsync();
+
+        var inspecao = await conn.QuerySingleOrDefaultAsync<InspecaoDetalhe>(
+            sqlInspecao, new { Id = id, RegiaoIds = regiaoIds });
+
+        if (inspecao is null)
+        {
+            return null;
+        }
+
+        var itens = await conn.QueryAsync<InspecaoItem>(sqlItens, new { Id = id });
+        inspecao.Itens = itens.ToList();
+        return inspecao;
     }
 }

@@ -99,7 +99,7 @@ CREATE TABLE inspecao_item (
     item_nome         text        NOT NULL,
     item_descricao    text        NOT NULL,
     item_ordem        integer     NOT NULL,
-    status            text        CHECK (status IN ('OK', 'PENDENTE', 'NA')),
+    resposta          text        CHECK (resposta IN ('OK', 'PENDENTE', 'NA')),
     observacao        text,
     criado_em         timestamptz NOT NULL DEFAULT now(),
     criado_por        integer     REFERENCES usuario (id),
