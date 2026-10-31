@@ -18,12 +18,27 @@
     <div class="alert alert-success">@Model.Mensagem</div>
 }
 
+<div class="card mb-3">
+    <div class="card-body d-flex flex-wrap align-items-center gap-4">
+        <div>
+            <div class="small text-muted">Percentual atual</div>
+            <div class="h4 mb-0" id="percentual">@PercentualRealizacao.Formatar(Model.PercentualAtual)</div>
+        </div>
+        <div class="small" id="contagem">
+            OK: @inspecao.Itens.Count(i => i.Resposta == RespostaItem.Ok) ·
+            Pendentes: @inspecao.Itens.Count(i => i.Resposta == RespostaItem.Pendente) ·
+            N/A: @inspecao.Itens.Count(i => i.Resposta == RespostaItem.NaoSeAplica) ·
+            Sem resposta: @inspecao.Itens.Count(i => i.Resposta is null)
+        </div>
+    </div>
+</div>
+
 @if (!string.IsNullOrEmpty(inspecao.Observacao))
 {
     <p><strong>Observação geral:</strong> @inspecao.Observacao</p>
 }
 
-<form method="post">
+<form method="post" id="form-checklist">
     @foreach (var categoria in inspecao.Itens.GroupBy(i => i.CategoriaNome))
     {
         <div class="card mb-3">
@@ -71,3 +86,32 @@
         </button>
     </div>
 </form>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('form-checklist');
+            const percentual = document.getElementById('percentual');
+            const contagem = document.getElementById('contagem');
+            const totalItens = form.querySelectorAll('.btn-group').length;
+
+            function atualizar() {
+                let ok = 0, pendentes = 0, na = 0;
+                form.querySelectorAll('input.btn-check:checked').forEach(function (radio) {
+                    if (radio.value === 'OK') ok++;
+                    else if (radio.value === 'PENDENTE') pendentes++;
+                    else if (radio.value === 'NA') na++;
+                });
+
+                percentual.textContent = (ok + pendentes === 0)
+                    ? '—'
+                    : (ok * 100 / (ok + pendentes)).toFixed(1).replace('.', ',') + '%';
+
+                contagem.textContent = 'OK: ' + ok + ' · Pendentes: ' + pendentes +
+                    ' · N/A: ' + na + ' · Sem resposta: ' + (totalItens - ok - pendentes - na);
+            }
+
+            form.addEventListener('change', atualizar);
+        })();
+    </script>
+}

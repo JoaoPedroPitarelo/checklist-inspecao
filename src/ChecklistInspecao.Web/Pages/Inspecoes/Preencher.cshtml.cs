@@ -26,6 +26,7 @@ public class PreencherModel : PageModel
     }
 
     public InspecaoDetalhe Inspecao { get; private set; } = null!;
+    public decimal? PercentualAtual => PercentualRealizacao.Calcular(Inspecao.Itens.Select(i => i.Resposta));
 
     [BindProperty]
     public List<ItemRespostaInput> Itens { get; set; } = [];
