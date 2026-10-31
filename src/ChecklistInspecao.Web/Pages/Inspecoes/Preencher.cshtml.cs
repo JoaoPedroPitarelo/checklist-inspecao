@@ -123,7 +123,7 @@ public class PreencherModel : PageModel
 
         if (inspecao.AutorId != _usuarioAtual.Id || !inspecao.EhRascunho)
         {
-            return Forbid();
+            return RedirectToPage("/Inspecoes/Detalhe", new { id });
         }
 
         Inspecao = inspecao;

@@ -1,7 +1,105 @@
 @page
+@model ChecklistInspecao.Web.Pages.Inspecoes.DetalheModel
 @{
     ViewData["Title"] = "Detalhe da inspeção";
+    var inspecao = Model.Inspecao;
+    var status = Exibicao.Status(inspecao.Status);
 }
 
-<h1 class="h3">Inspeção nº @Request.Query["id"]</h1>
-<p class="text-muted">Concluída.</p>
+@if (Model.Mensagem is not null)
+{
+    <div class="alert alert-success">@Model.Mensagem</div>
+}
+
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Inspeção nº @inspecao.Id</h1>
+    <span class="badge @status.Classe">@status.Texto</span>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-md-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Loja</dt>
+                    <dd class="col-sm-8">@inspecao.LojaNumero - @inspecao.LojaNome</dd>
+
+                    <dt class="col-sm-4">Região</dt>
+                    <dd class="col-sm-8">@inspecao.RegiaoNome</dd>
+
+                    <dt class="col-sm-4">Gerente</dt>
+                    <dd class="col-sm-8">@inspecao.GerenteNome</dd>
+
+                    <dt class="col-sm-4">Data da visita</dt>
+                    <dd class="col-sm-8">@inspecao.DataVisita.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Criada por</dt>
+                    <dd class="col-sm-8">@inspecao.AutorNome em @Exibicao.DataHora(inspecao.CriadoEm)</dd>
+
+                    <dt class="col-sm-4">Última alteração</dt>
+                    <dd class="col-sm-8">
+                        @if (inspecao.ModificadoEm is not null)
+                        {
+                            @:@inspecao.ModificadoPorNome em @Exibicao.DataHora(inspecao.ModificadoEm.Value)
+                        }
+                        else
+                        {
+                            @:—
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="small text-muted">
+                    Percentual de realização@(inspecao.EhRascunho ? " (parcial)" : "")
+                </div>
+                <div class="display-6">@PercentualRealizacao.Formatar(Model.Percentual)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(inspecao.Observacao))
+{
+    <div class="card mb-3">
+        <div class="card-body"><strong>Observação geral:</strong> @inspecao.Observacao</div>
+    </div>
+}
+
+@foreach (var categoria in inspecao.Itens.GroupBy(i => i.CategoriaNome))
+{
+    <div class="card mb-3">
+        <div class="card-header fw-bold">@categoria.Key</div>
+        <ul class="list-group list-group-flush">
+            @foreach (var item in categoria)
+            {
+                var resposta = Exibicao.Resposta(item.Resposta);
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div>
+                            <div class="fw-semibold">@item.ItemOrdem. @item.ItemNome</div>
+                            <div class="small text-muted">@item.ItemDescricao</div>
+                        </div>
+                        <span class="badge @resposta.Classe">@resposta.Texto</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(item.Observacao))
+                    {
+                        <div class="small mt-2 fst-italic">"@item.Observacao"</div>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.PodeEditar)
+{
+    <a asp-page="/Inspecoes/Preencher" asp-route-id="@inspecao.Id" class="btn btn-primary w-100 mb-3">
+        Continuar preenchimento
+    </a>
+}
