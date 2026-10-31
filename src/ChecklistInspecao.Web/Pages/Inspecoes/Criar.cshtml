@@ -1,0 +1,46 @@
+@page
+@model ChecklistInspecao.Web.Pages.Inspecoes.CriarModel
+@{
+    ViewData["Title"] = "Nova inspeção";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <h1 class="h3 mb-3">Nova inspeção</h1>
+
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Input.LojaId" class="form-label">Loja</label>
+                <select asp-for="Input.LojaId" class="form-select">
+                    <option value="">Selecione...</option>
+                    @foreach (var loja in Model.Lojas)
+                    {
+                        <option value="@loja.Id">@loja.Numero - @loja.Nome (@loja.RegiaoNome)</option>
+                    }
+                </select>
+                <span asp-validation-for="Input.LojaId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.DataVisita" class="form-label">Data da visita</label>
+                <input asp-for="Input.DataVisita" class="form-control"
+                       max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="Input.DataVisita" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Observacao" class="form-label">Observação geral (opcional)</label>
+                <textarea asp-for="Input.Observacao" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Input.Observacao" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Criar inspeção</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
