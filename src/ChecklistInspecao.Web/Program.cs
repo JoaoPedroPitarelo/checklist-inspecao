@@ -23,6 +23,7 @@ Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // ---- Repositórios ----
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<LojaRepository>();
 
 // Serviço do usuário logodo
 builder.Services.AddHttpContextAccessor();

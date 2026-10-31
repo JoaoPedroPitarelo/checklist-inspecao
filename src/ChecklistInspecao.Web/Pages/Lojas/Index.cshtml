@@ -1,0 +1,49 @@
+@page
+@model ChecklistInspecao.Web.Pages.Lojas.IndexModel
+@{
+    ViewData["Title"] = "Lojas";
+}
+
+<h1 class="h3 mb-3">Lojas</h1>
+
+@if (Model.Lojas.Count == 0)
+{
+    <p class="text-muted">Nenhuma loja encontrada.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Nome</th>
+                    <th>Região</th>
+                    <th>Gerente</th>
+                    <th>Situação</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var loja in Model.Lojas)
+                {
+                    <tr>
+                        <td>@loja.Numero</td>
+                        <td>@loja.Nome</td>
+                        <td>@loja.RegiaoNome</td>
+                        <td>@loja.GerenteNome</td>
+                        <td>
+                            @if (loja.Ativo)
+                            {
+                                <span class="badge bg-success">Ativa</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inativa</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
