@@ -1,0 +1,31 @@
+﻿@page
+@model ChecklistInspecao.Web.Pages.LoginModel
+@{
+    ViewData["Title"] = "Entrar";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-8 col-md-5 col-lg-4">
+        <h1 class="h3 mb-4 text-center">Checklist de Inspeção</h1>
+
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="mb-3">
+                <label asp-for="Input.Login" class="form-label">Usuário</label>
+                <input asp-for="Input.Login" class="form-control" autocomplete="username" autofocus />
+                <span asp-validation-for="Input.Login" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Senha" class="form-label">Senha</label>
+                <input asp-for="Input.Senha" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Input.Senha" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+    </div>
+</div>
