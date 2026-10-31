@@ -1,10 +1,17 @@
 using Npgsql;
 using ChecklistInspecao.Web.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ----- Adição de serviços -----
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    // Páginas que podem ser acessadas sem autentição
+    options.Conventions.AllowAnonymousToPage("/Login");
+    options.Conventions.AllowAnonymousToPage("/Error");
+});
 
 // "Pool" de conexo, singleton registrado somente uma vez
 builder.Services.AddSingleton(NpgsqlDataSource.Create(
@@ -15,6 +22,23 @@ Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // Repositórios: ----
 builder.Services.AddScoped<UsuarioRepository>();
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/AcessoNegado";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 // ----- Fim da adição de serviços -----
 
@@ -30,11 +54,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapRazorPages();
 
 app.Run();
