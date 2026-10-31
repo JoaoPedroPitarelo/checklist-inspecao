@@ -118,4 +118,51 @@ public class InspecaoRepository
         inspecao.Itens = itens.ToList();
         return inspecao;
     }
+
+    public async Task<bool> SalvarRespostasAsync(int inspecaoId, int usuarioId, IEnumerable<ItemRespostaInput> itens)
+    {
+        const string sqlInspecao = """
+            UPDATE inspecao
+            SET modificado_em = now(),
+                modificado_por = @UsuarioId
+            WHERE id = @InspecaoId
+                AND autor_id = @UsuarioId
+                AND status = 'RASCUNHO'
+        """;
+
+        const string sqlItem = """
+            UPDATE inspecao_item
+            SET resposta = @Resposta,
+                observacao = @Observacao,
+                modificado_em = now(),
+                modificado_por = @UsuarioId
+            WHERE id = @Id
+                AND inspecao_id = @InspecaoId
+                AND (resposta IS DISTINCT FROM @Resposta
+                    OR observacao IS DISTINCT FROM @Observacao)
+        """;
+
+        await using var conn = await _dataSource.OpenConnectionAsync();
+        await using var tx = await conn.BeginTransactionAsync();
+
+        var linhas = await conn.ExecuteAsync(sqlInspecao, new { InspecaoId = inspecaoId, UsuarioId = usuarioId }, tx);
+        if (linhas == 0)
+        {
+            return false;
+        }
+
+        var parametros = itens.Select(i => new
+        {
+            i.Id,
+            i.Resposta,
+            i.Observacao,
+            InspecaoId = inspecaoId,
+            UsuarioId = usuarioId
+        });
+
+        await conn.ExecuteAsync(sqlItem, parametros, tx);
+
+        await tx.CommitAsync();
+        return true;
+    }
 }

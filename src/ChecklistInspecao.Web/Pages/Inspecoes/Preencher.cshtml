@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Preencher inspeção";
     var inspecao = Model.Inspecao;
+    var indice = 0;
 }
 
 <h1 class="h3 mb-1">Inspeção nº @inspecao.Id</h1>
@@ -12,24 +13,61 @@
     <span class="badge bg-warning text-dark ms-1">Rascunho</span>
 </p>
 
+@if (Model.Mensagem is not null)
+{
+    <div class="alert alert-success">@Model.Mensagem</div>
+}
+
 @if (!string.IsNullOrEmpty(inspecao.Observacao))
 {
     <p><strong>Observação geral:</strong> @inspecao.Observacao</p>
 }
 
-@foreach (var categoria in inspecao.Itens.GroupBy(i => i.CategoriaNome))
-{
-    <div class="card mb-3">
-        <div class="card-header fw-bold">@categoria.Key</div>
-        <ul class="list-group list-group-flush">
-            @foreach (var item in categoria)
-            {
-                <li class="list-group-item">
-                    <div class="fw-semibold">@item.ItemOrdem. @item.ItemNome</div>
-                    <div class="small text-muted">@item.ItemDescricao</div>
-                    <div class="small mt-1">Resposta: @(item.Resposta ?? "não respondido")</div>
-                </li>
-            }
-        </ul>
+<form method="post">
+    @foreach (var categoria in inspecao.Itens.GroupBy(i => i.CategoriaNome))
+    {
+        <div class="card mb-3">
+            <div class="card-header fw-bold">@categoria.Key</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var item in categoria)
+                {
+                    <li class="list-group-item">
+                        <input type="hidden" name="Itens[@indice].Id" value="@item.Id" />
+
+                        <div class="fw-semibold">@item.ItemOrdem. @item.ItemNome</div>
+                        <div class="small text-muted mb-2">@item.ItemDescricao</div>
+
+                        <div class="btn-group w-100 mb-2" role="group">
+                            <input type="radio" class="btn-check" autocomplete="off"
+                                   name="Itens[@indice].Resposta" id="item-@indice-ok"
+                                   value="@RespostaItem.Ok" checked="@(item.Resposta == RespostaItem.Ok)" />
+                            <label class="btn btn-outline-success" for="item-@indice-ok">OK</label>
+
+                            <input type="radio" class="btn-check" autocomplete="off"
+                                   name="Itens[@indice].Resposta" id="item-@indice-pendente"
+                                   value="@RespostaItem.Pendente" checked="@(item.Resposta == RespostaItem.Pendente)" />
+                            <label class="btn btn-outline-danger" for="item-@indice-pendente">Pendente</label>
+
+                            <input type="radio" class="btn-check" autocomplete="off"
+                                   name="Itens[@indice].Resposta" id="item-@indice-na"
+                                   value="@RespostaItem.NaoSeAplica" checked="@(item.Resposta == RespostaItem.NaoSeAplica)" />
+                            <label class="btn btn-outline-secondary" for="item-@indice-na">N/A</label>
+                        </div>
+
+                        <textarea name="Itens[@indice].Observacao" class="form-control form-control-sm" rows="2"
+                                  placeholder="Observação (obrigatória se Pendente)">@item.Observacao</textarea>
+                    </li>
+
+                    indice++;
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="bg-white border-top py-2" style="position: sticky; bottom: 0;">
+        <button type="submit" class="btn btn-primary w-100"
+                asp-page-handler="Salvar" asp-route-id="@inspecao.Id">
+            Salvar rascunho
+        </button>
     </div>
-}
+</form>
