@@ -15,10 +15,41 @@ public class InspecaoRepository
             modificado_em = now(),
             modificado_por = @UsuarioId
         WHERE id = @Id
-        AND inspecao_id = @InspecaoId
-        AND (resposta IS DISTINCT FROM @Resposta
-            OR observacao IS DISTINCT FROM @Observacao)
+            AND inspecao_id = @InspecaoId
+            AND (resposta IS DISTINCT FROM @Resposta
+                OR observacao IS DISTINCT FROM @Observacao)
     """;
+
+    private const string SqlContarHistorico = "SELECT count(*) " + FiltrosHistorico;
+
+    private const string SqlListarHistorico = """
+        SELECT i.id,
+            i.data_visita,
+            l.numero AS loja_numero,
+            l.nome   AS loja_nome,
+            r.nome   AS regiao_nome,
+            a.nome   AS autor_nome,
+            i.status,
+            i.percentual
+
+        """ + FiltrosHistorico + """
+
+        ORDER BY i.data_visita DESC, i.id DESC
+        LIMIT @Limite OFFSET @Offset
+    """;
+
+    private const string FiltrosHistorico = """
+        FROM inspecao i
+            JOIN loja    l ON l.id = i.loja_id
+            JOIN regiao  r ON r.id = i.regiao_id
+            JOIN usuario a ON a.id = i.autor_id
+        WHERE i.regiao_id = ANY(@RegiaoIds)
+        AND (@DataInicio::date IS NULL OR i.data_visita >= @DataInicio::date)
+        AND (@DataFim::date    IS NULL OR i.data_visita <= @DataFim::date)
+        AND (@RegiaoId::int    IS NULL OR i.regiao_id = @RegiaoId::int)
+        AND (@LojaId::int      IS NULL OR i.loja_id = @LojaId::int)
+        AND (@Status::text     IS NULL OR i.status = @Status::text)
+        """;
 
     private static Task<int> AtualizarItensAsync(
         NpgsqlConnection conn, NpgsqlTransaction tx, int inspecaoId, int usuarioId, 
@@ -172,7 +203,6 @@ public class InspecaoRepository
         await tx.CommitAsync();
         return true;
     }
-
    
     public async Task<bool> ConcluirAsync(int inspecaoId, int usuarioId, 
         IEnumerable<ItemRespostaInput> itens, decimal? percentual)
@@ -207,5 +237,28 @@ public class InspecaoRepository
 
         await tx.CommitAsync();
         return true;
+    }
+
+    public async Task<(IReadOnlyList<InspecaoResumo> Itens, int Total)> ListarHistoricoAsync(
+        FiltroHistorico filtro, int[] regiaoIds, int pagina, int tamanhoPagina)
+    {
+        var parametros = new
+        {
+            RegiaoIds = regiaoIds,
+            filtro.DataInicio,
+            filtro.DataFim,
+            filtro.RegiaoId,
+            filtro.LojaId,
+            filtro.Status,
+            Limite = tamanhoPagina,
+            Offset = (pagina - 1) * tamanhoPagina
+        };
+
+        await using var conn = await _dataSource.OpenConnectionAsync();
+
+        var total = await conn.ExecuteScalarAsync<int>(SqlContarHistorico, parametros);
+        var itens = await conn.QueryAsync<InspecaoResumo>(SqlListarHistorico, parametros);
+
+        return (itens.ToList(), total);
     }
 }

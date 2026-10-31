@@ -1,0 +1,117 @@
+@page
+@model ChecklistInspecao.Web.Pages.Inspecoes.IndexModel
+@{
+    ViewData["Title"] = "Histórico de inspeções";
+}
+
+<h1 class="h3 mb-3">Histórico de inspeções</h1>
+
+<form method="get" class="card card-body mb-3">
+    <div class="row g-2">
+        <div class="col-6 col-md-2">
+            <label asp-for="DataInicio" class="form-label small mb-1">De</label>
+            <input asp-for="DataInicio" class="form-control form-control-sm" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label asp-for="DataFim" class="form-label small mb-1">Até</label>
+            <input asp-for="DataFim" class="form-control form-control-sm" />
+        </div>
+        <div class="col-12 col-md-3">
+            <label asp-for="RegiaoId" class="form-label small mb-1">Região</label>
+            <select asp-for="RegiaoId" class="form-select form-select-sm">
+                <option value="">Todas</option>
+                @foreach (var regiao in Model.Regioes)
+                {
+                    <option value="@regiao.Id">@regiao.Nome</option>
+                }
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <label asp-for="LojaId" class="form-label small mb-1">Loja</label>
+            <select asp-for="LojaId" class="form-select form-select-sm">
+                <option value="">Todas</option>
+                @foreach (var loja in Model.Lojas)
+                {
+                    <option value="@loja.Id">@loja.Numero - @loja.Nome</option>
+                }
+            </select>
+        </div>
+        <div class="col-12 col-md-2">
+            <label asp-for="Status" class="form-label small mb-1">Status</label>
+            <select asp-for="Status" class="form-select form-select-sm">
+                <option value="">Todos</option>
+                <option value="@StatusInspecao.Rascunho">Rascunho</option>
+                <option value="@StatusInspecao.Concluida">Concluída</option>
+                <option value="@StatusInspecao.Encerrada">Encerrada</option>
+            </select>
+        </div>
+    </div>
+
+    <span asp-validation-for="DataFim" class="text-danger small mt-2"></span>
+
+    <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <a asp-page="/Inspecoes/Index" class="btn btn-outline-secondary btn-sm">Limpar</a>
+    </div>
+</form>
+
+<p class="text-muted small mb-2">@Model.Total inspeção(ões) encontrada(s)</p>
+
+@if (Model.Inspecoes.Count == 0)
+{
+    <p class="text-muted">Nenhuma inspeção encontrada com esses filtros.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Visita</th>
+                    <th>Loja</th>
+                    <th class="d-none d-md-table-cell">Região</th>
+                    <th class="d-none d-md-table-cell">Autor</th>
+                    <th>Status</th>
+                    <th class="text-end">%</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var inspecao in Model.Inspecoes)
+                {
+                    var status = Exibicao.Status(inspecao.Status);
+                    <tr>
+                        <td>
+                            <a asp-page="/Inspecoes/Detalhe" asp-route-id="@inspecao.Id">@inspecao.Id</a>
+                        </td>
+                        <td>@inspecao.DataVisita.ToString("dd/MM/yyyy")</td>
+                        <td>@inspecao.LojaNumero - @inspecao.LojaNome</td>
+                        <td class="d-none d-md-table-cell">@inspecao.RegiaoNome</td>
+                        <td class="d-none d-md-table-cell">@inspecao.AutorNome</td>
+                        <td><span class="badge @status.Classe">@status.Texto</span></td>
+                        <td class="text-end">@PercentualRealizacao.Formatar(inspecao.Percentual)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPaginas > 1)
+    {
+        <nav>
+            <ul class="pagination pagination-sm justify-content-center">
+                <li class="page-item @(Model.Pagina <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-page="/Inspecoes/Index"
+                       asp-all-route-data="Model.RotaDaPagina(Model.Pagina - 1)">Anterior</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Página @Model.Pagina de @Model.TotalPaginas</span>
+                </li>
+                <li class="page-item @(Model.Pagina >= Model.TotalPaginas ? "disabled" : "")">
+                    <a class="page-link" asp-page="/Inspecoes/Index"
+                       asp-all-route-data="Model.RotaDaPagina(Model.Pagina + 1)">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
