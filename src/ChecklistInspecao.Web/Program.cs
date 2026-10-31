@@ -1,7 +1,8 @@
 using Npgsql;
-using ChecklistInspecao.Web.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using ChecklistInspecao.Web.Data;
+using ChecklistInspecao.Web.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +21,12 @@ builder.Services.AddSingleton(NpgsqlDataSource.Create(
 // mapea colunas em snake_case para PascalCase senha_hash -> SenhaHash
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-// Repositórios: ----
+// ---- Repositórios ----
 builder.Services.AddScoped<UsuarioRepository>();
+
+// Serviço do usuário logodo
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<UsuarioAtual>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
