@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- Regiões
 INSERT INTO regiao (nome) VALUES

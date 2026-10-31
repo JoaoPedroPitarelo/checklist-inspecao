@@ -1,16 +1,22 @@
 using Npgsql;
+using ChecklistInspecao.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ----- Adição de serviços -----
 builder.Services.AddRazorPages();
 
 // "Pool" de conexo, singleton registrado somente uma vez
 builder.Services.AddSingleton(NpgsqlDataSource.Create(
     builder.Configuration.GetConnectionString("Default")!));
 
-// mapea senha_hash -> SenhaHash
+// mapea colunas em snake_case para PascalCase senha_hash -> SenhaHash
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+// Repositórios: ----
+builder.Services.AddScoped<UsuarioRepository>();
+
+// ----- Fim da adição de serviços -----
 
 var app = builder.Build();
 
