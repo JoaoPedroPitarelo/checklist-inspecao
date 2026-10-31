@@ -1,0 +1,11 @@
+@page
+@{
+    ViewData["Title"] = "Acesso negado";
+    Response.StatusCode = StatusCodes.Status403Forbidden;
+}
+
+<div class="text-center py-5">
+    <h1 class="h3 mb-3">Acesso negado</h1>
+    <p class="text-muted mb-4">Seu perfil não tem permissão para acessar esta página.</p>
+    <a asp-page="/Index" class="btn btn-primary">Voltar ao início</a>
+</div>
