@@ -8,6 +8,34 @@ public class InspecaoRepository
 {
     private readonly NpgsqlDataSource _dataSource;
 
+    private const string SqlAtualizarItem = """
+        UPDATE inspecao_item
+        SET resposta = @Resposta,
+            observacao = @Observacao,
+            modificado_em = now(),
+            modificado_por = @UsuarioId
+        WHERE id = @Id
+        AND inspecao_id = @InspecaoId
+        AND (resposta IS DISTINCT FROM @Resposta
+            OR observacao IS DISTINCT FROM @Observacao)
+    """;
+
+    private static Task<int> AtualizarItensAsync(
+        NpgsqlConnection conn, NpgsqlTransaction tx, int inspecaoId, int usuarioId, 
+        IEnumerable<ItemRespostaInput> itens)
+    {
+        var parametros = itens.Select(i => new
+        {
+            i.Id,
+            i.Resposta,
+            i.Observacao,
+            InspecaoId = inspecaoId,
+            UsuarioId = usuarioId
+        });
+
+        return conn.ExecuteAsync(SqlAtualizarItem, parametros, tx);
+    }
+
     public InspecaoRepository(NpgsqlDataSource dataSource)
     {
         _dataSource = dataSource;
@@ -130,18 +158,6 @@ public class InspecaoRepository
                 AND status = 'RASCUNHO'
         """;
 
-        const string sqlItem = """
-            UPDATE inspecao_item
-            SET resposta = @Resposta,
-                observacao = @Observacao,
-                modificado_em = now(),
-                modificado_por = @UsuarioId
-            WHERE id = @Id
-                AND inspecao_id = @InspecaoId
-                AND (resposta IS DISTINCT FROM @Resposta
-                    OR observacao IS DISTINCT FROM @Observacao)
-        """;
-
         await using var conn = await _dataSource.OpenConnectionAsync();
         await using var tx = await conn.BeginTransactionAsync();
 
@@ -151,16 +167,43 @@ public class InspecaoRepository
             return false;
         }
 
-        var parametros = itens.Select(i => new
-        {
-            i.Id,
-            i.Resposta,
-            i.Observacao,
-            InspecaoId = inspecaoId,
-            UsuarioId = usuarioId
-        });
+        await AtualizarItensAsync(conn, tx, inspecaoId, usuarioId, itens);
 
-        await conn.ExecuteAsync(sqlItem, parametros, tx);
+        await tx.CommitAsync();
+        return true;
+    }
+
+   
+    public async Task<bool> ConcluirAsync(int inspecaoId, int usuarioId, 
+        IEnumerable<ItemRespostaInput> itens, decimal? percentual)
+    {
+        const string sqlInspecao = """
+            UPDATE inspecao
+            SET status = 'CONCLUIDA',
+                percentual = @Percentual,
+                modificado_em = now(),
+                modificado_por = @UsuarioId
+            WHERE id = @InspecaoId
+                AND autor_id = @UsuarioId
+                AND status = 'RASCUNHO'
+        """;
+
+        await using var conn = await _dataSource.OpenConnectionAsync();
+        await using var tx = await conn.BeginTransactionAsync();
+
+        var linhas = await conn.ExecuteAsync(sqlInspecao, new
+        {
+            InspecaoId = inspecaoId,
+            UsuarioId = usuarioId,
+            Percentual = percentual
+        }, tx);
+
+        if (linhas == 0)
+        {
+            return false;
+        }
+
+        await AtualizarItensAsync(conn, tx, inspecaoId, usuarioId, itens);
 
         await tx.CommitAsync();
         return true;

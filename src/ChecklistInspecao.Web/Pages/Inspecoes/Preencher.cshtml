@@ -18,6 +18,19 @@
     <div class="alert alert-success">@Model.Mensagem</div>
 }
 
+@if (Model.Problemas.Count > 0)
+{
+    <div class="alert alert-danger">
+        <strong>Não foi possível concluir. Corrija os itens abaixo:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach (var problema in Model.Problemas)
+            {
+                <li>@problema.Mensagem</li>
+            }
+        </ul>
+    </div>
+}
+
 <div class="card mb-3">
     <div class="card-body d-flex flex-wrap align-items-center gap-4">
         <div>
@@ -46,7 +59,7 @@
             <ul class="list-group list-group-flush">
                 @foreach (var item in categoria)
                 {
-                    <li class="list-group-item">
+                    <li class="list-group-item @(Model.Problemas.Any(p => p.ItemId == item.Id) ? "list-group-item-danger" : "")">
                         <input type="hidden" name="Itens[@indice].Id" value="@item.Id" />
 
                         <div class="fw-semibold">@item.ItemOrdem. @item.ItemNome</div>
@@ -79,10 +92,15 @@
         </div>
     }
 
-    <div class="bg-white border-top py-2" style="position: sticky; bottom: 0;">
-        <button type="submit" class="btn btn-primary w-100"
+    <div class="bg-white border-top py-2 d-flex gap-2" style="position: sticky; bottom: 0;">
+        <button type="submit" class="btn btn-outline-primary flex-fill"
                 asp-page-handler="Salvar" asp-route-id="@inspecao.Id">
             Salvar rascunho
+        </button>
+        <button type="submit" class="btn btn-success flex-fill"
+                asp-page-handler="Concluir" asp-route-id="@inspecao.Id"
+                onclick="return confirm('Concluir a inspeção? Depois de concluída, ela não poderá mais ser alterada.');">
+            Concluir
         </button>
     </div>
 </form>
