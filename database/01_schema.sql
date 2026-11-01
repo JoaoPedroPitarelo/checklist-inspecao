@@ -50,7 +50,7 @@ CREATE TABLE loja (
     modificado_por integer     REFERENCES usuario (id)
 );
 
-CREATE TABLE categoria_item (
+CREATE TABLE categoria (
     id             integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome           text        NOT NULL UNIQUE,
     ordem          integer     NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE categoria_item (
 
 CREATE TABLE item_checklist (
     id             integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    categoria_id   integer     NOT NULL REFERENCES categoria_item (id),
+    categoria_id   integer     NOT NULL REFERENCES categoria (id),
     nome           text        NOT NULL,
     descricao      text        NOT NULL,
     ordem          integer     NOT NULL,
