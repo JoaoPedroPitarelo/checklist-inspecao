@@ -3,14 +3,14 @@
 Aplicação Web para os supervisores regionais da rede **Passo Certo** registrarem inspeções de padrão de qualidade das lojas.
 
 Desenvolvido como prova técnica para Desenvolvedor(a) .NET Júnior da empresa 
-[SystemFy ](https://www.linkedin.com/company/systemfy/home/)
+**[SystemFy](https://www.linkedin.com/company/systemfy/home/)**
 
 **Stack:** 
 - .NET 8 
 - ASP.NET Core Razor Pages
 - PostgreSQL 16
 - Npgsql + Dapper (SQL escrito à mão, sem ORM)
-- Bootstrap 5
+- Bootstrap 5.1 + Bootstrap Icons
 
 ---
 
@@ -24,7 +24,7 @@ Desenvolvido como prova técnica para Desenvolvedor(a) .NET Júnior da empresa
 - [Decisões técnicas](#decisões-técnicas)
 - [Premissas adotadas](#premissas-adotadas)
 - [Bônus implementados](#bônus-implementados)
-- [Melhorias que faria](#melhorias-que-faria)
+- [Melhorias futuras](#melhorias-futuras)
 - [Estrutura do projeto](#estrutura-do-projeto)
 
 ---
@@ -35,7 +35,7 @@ Desenvolvido como prova técnica para Desenvolvedor(a) .NET Júnior da empresa
 | ----------------------- | --------------- |
 | .NET SDK                | 8.0 ou superior |
 | PostgreSQL              | 14 ou superior  |
-| Docker + Docker Compose | opcional        |
+| Docker + Docker Compose ou Podman + Podman Compose | opcional        |
 
 ---
 
@@ -93,9 +93,9 @@ docker compose down -v && docker compose up -d
 psql -U postgres -c "CREATE USER checklist WITH PASSWORD 'checklist';"
 psql -U postgres -c "CREATE DATABASE checklist OWNER checklist;"
 
-psql -U checklist -d checklist -h localhost -f database/schema.sql
-psql -U checklist -d checklist -h localhost -f database/seed.sql
-psql -U checklist -d checklist -h localhost -f database/dashboard_records.sql
+psql -U checklist -d checklist -h localhost -f database/01_schema.sql
+psql -U checklist -d checklist -h localhost -f database/02_seed.sql
+psql -U checklist -d checklist -h localhost -f database/03_dashboard_records.sql
 ```
 
 
@@ -143,7 +143,7 @@ Todos os usuário tem usam a senha **`Prova@123`**.
 | `diego.costa`  | Supervisor    | Interior      |
 | `helena.prado` | Diretoria     | Todas         |
 | `carla.nunes`  | Administrador | Todas         |
-| `sergio.lima`  | Supervisor    | Interior      |
+| `sergio.lima`  | Supervisor    | Interior · **inativo** (login deve ser recusado) |
 
 ### Valores de referência
 
@@ -172,7 +172,7 @@ Logo após a carga dos três scripts, o dashboard de `helena.prado` com o perío
 | RF06 Histórico            | Menu **Histórico** (lista paginada) → número da inspeção (detalhe)                     |
 | RF07 Dashboard            | Página inicial                                                                         |
 | RF08 Auditoria            | Colunas em todas as tabelas; exibida no detalhe da inspeção                            |
-| RF09 Scripts de banco     | Pasta [`database/`](database/), arquivos: schema.sql, seed.sql e dashboard_records.sql |
+| RF09 Scripts de banco     | Pasta [`database/`](database/), arquivos: 01_schema.sql, 02_seed.sql e 03_dashboard_records.sql |
 | RF10 Responsividade       | Bootstrap; criar e preencher pensados para dispositivos móveis                         |
 
 ---
@@ -251,8 +251,9 @@ Pontos principais:
 
 | Código | Bônus | Situação |
 |---|---|---|
-| BN08 | Docker | ✅ `docker-compose.yml` com PostgreSQL 16 e os scripts aplicados automaticamente |
-
+| BN05 | Impressão / PDF | Botão **Imprimir / PDF** no detalhe da inspeção; versão de impressão via CSS (`@media print`). O PDF é gerado pelo "Salvar como PDF" do navegador |
+| BN07 | Testes automatizados | 23 testes unitários (xUnit) das regras de percentual (RN01) e de conclusão (RN03, RN04). Ver [Executar os testes](#5-executar-os-testes) |
+| BN08 | Docker | `docker-compose.yml` com PostgreSQL 16 e os scripts aplicados automaticamente |
 ---
 
 ## Melhorias futuras
