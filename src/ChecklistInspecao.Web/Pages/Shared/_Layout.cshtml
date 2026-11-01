@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Checklist Inspeção</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ChecklistInspecao.Web.styles.css" asp-append-version="true" />
 </head>
@@ -47,7 +48,12 @@
                         </ul>
 
                         <div class="d-flex align-items-center gap-3">
-                            <span class="navbar-text">@User.Identity.Name</span>
+                            @{
+                                var perfil = Exibicao.Perfil(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value);
+                            }
+                            <span class="text-light" title="@perfil.Nome">
+                                <i class="bi @perfil.Icone me-1" aria-hidden="true"></i>@User.Identity.Name
+                            </span>
                             <form method="post" asp-page="/Logout" class="m-0">
                                 <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
                             </form>

@@ -25,4 +25,12 @@ public static class Exibicao
         RespostaItem.NaoSeAplica => ("N/A", "bg-secondary"),
         _ => ("Sem resposta", "bg-light text-dark border")
     };
+
+    public static (string Icone, string Nome) Perfil(string? perfil) => perfil switch
+    {
+        Perfis.Supervisor => ("bi-clipboard-check", "Supervisor"),
+        Perfis.Diretoria => ("bi-graph-up", "Diretoria"),
+        Perfis.Administrador => ("bi-gear", "Administrador"),
+        _ => ("bi-person-circle", "Usuário")
+    };
 }
