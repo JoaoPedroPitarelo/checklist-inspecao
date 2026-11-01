@@ -1,20 +1,29 @@
 @page
 @model ChecklistInspecao.Web.Pages.Inspecoes.DetalheModel
 @{
-    ViewData["Title"] = "Detalhe da inspeção";
+    ViewData["Title"] = $"Inspeção nº {Model.Inspecao.Id}";
     var inspecao = Model.Inspecao;
     var status = Exibicao.Status(inspecao.Status);
 }
 
 @if (Model.Mensagem is not null)
 {
-    <div class="alert alert-success">@Model.Mensagem</div>
+    <div class="alert alert-success d-print-none">@Model.Mensagem</div>
 }
 
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
     <h1 class="h3 mb-0">Inspeção nº @inspecao.Id</h1>
     <span class="badge @status.Classe">@status.Texto</span>
+    <button type="button" class="btn btn-outline-secondary btn-sm ms-auto d-print-none"
+            onclick="window.print()">
+        Imprimir / PDF
+    </button>
 </div>
+
+<p class="d-none d-print-block small text-muted">
+    Passo Certo · Checklist de Inspeção de Lojas ·
+    emitido em @Exibicao.DataHora(DateTime.UtcNow) por @User.Identity!.Name
+</p>
 
 <div class="row g-3 mb-3">
     <div class="col-12 col-md-8">
@@ -99,7 +108,7 @@
 
 @if (Model.PodeEditar)
 {
-    <a asp-page="/Inspecoes/Preencher" asp-route-id="@inspecao.Id" class="btn btn-primary w-100 mb-3">
+    <a asp-page="/Inspecoes/Preencher" asp-route-id="@inspecao.Id" class="btn btn-primary w-100 mb-3 d-print-none">
         Continuar preenchimento
     </a>
 }
