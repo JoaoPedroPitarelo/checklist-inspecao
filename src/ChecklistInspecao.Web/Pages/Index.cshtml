@@ -95,3 +95,104 @@
         </div>
     </div>
 </div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-bold">Lojas não inspecionadas no período</div>
+            @if (Model.NaoInspecionadas.Count == 0)
+            {
+                <div class="card-body text-muted">Todas as lojas ativas foram inspecionadas.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Loja</th>
+                                <th>Região</th>
+                                <th class="text-end">Última visita</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loja in Model.NaoInspecionadas)
+                            {
+                                <tr>
+                                    <td>@loja.Numero - @loja.Nome</td>
+                                    <td>@loja.RegiaoNome</td>
+                                    <td class="text-end">@(loja.UltimaVisita?.ToString("dd/MM/yyyy") ?? "Nunca")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-bold">Top 5 itens com mais pendências</div>
+            @if (Model.TopPendencias.Count == 0)
+            {
+                <div class="card-body text-muted">Nenhuma pendência no período.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th class="text-end">Pendências</th>
+                                <th class="text-end">Lojas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.TopPendencias)
+                            {
+                                <tr>
+                                    <td>@item.ItemNome</td>
+                                    <td class="text-end">@item.Pendencias</td>
+                                    <td class="text-end">@item.LojasAfetadas</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header fw-bold">Consolidado por região</div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Região</th>
+                    <th class="text-end">Lojas</th>
+                    <th class="text-end">Inspecionadas</th>
+                    <th class="text-end">Inspeções</th>
+                    <th class="text-end">% médio</th>
+                    <th class="text-end">Pendências</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var regiao in Model.PorRegiao)
+                {
+                    <tr>
+                        <td>@regiao.RegiaoNome</td>
+                        <td class="text-end">@regiao.Lojas</td>
+                        <td class="text-end">@regiao.LojasInspecionadas</td>
+                        <td class="text-end">@regiao.Inspecoes</td>
+                        <td class="text-end">@PercentualRealizacao.Formatar(regiao.PercentualMedio)</td>
+                        <td class="text-end">@regiao.Pendencias</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -41,6 +41,9 @@ public class IndexModel : PageModel
     public int? LojaId { get; set; }
 
     public DashboardResumo Resumo { get; private set; } = new();
+    public IReadOnlyList<LojaNaoInspecionada> NaoInspecionadas { get; private set; } = [];
+    public IReadOnlyList<ItemPendencia> TopPendencias { get; private set; } = [];
+    public IReadOnlyList<ConsolidadoRegiao> PorRegiao { get; private set; } = [];
 
     public IReadOnlyList<Opcao> Regioes { get; private set; } = [];
     public IReadOnlyList<LojaResumo> Lojas { get; private set; } = [];
@@ -62,5 +65,8 @@ public class IndexModel : PageModel
 
         var filtro = new FiltroDashboard(DataInicio.Value, DataFim.Value, RegiaoId, LojaId);
         Resumo = await _dashboardRepository.ObterResumoAsync(filtro, regiaoIds);
+        NaoInspecionadas = await _dashboardRepository.ListarNaoInspecionadasAsync(filtro, regiaoIds);
+        TopPendencias = await _dashboardRepository.ListarTopPendenciasAsync(filtro, regiaoIds);
+        PorRegiao = await _dashboardRepository.ListarPorRegiaoAsync(filtro, regiaoIds);
     }
 }
