@@ -1,6 +1,6 @@
 using ChecklistInspecao.Web.Models;
 
-namespace ChecklistInspecao.Web.services;
+namespace ChecklistInspecao.Web.Services;
 
 public record ProblemaConclusao(int ItemId, string Mensagem);
 

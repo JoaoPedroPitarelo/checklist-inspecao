@@ -14,8 +14,6 @@ ___
 - ###### Cada loja pertence a uma _única região_
 - ###### Cada loja tem 1 gerente, que é responsável pela loja.
 
-![[separacao_rede.png]]
-
 #### Qual o problema que querem resolver?
 
 - CheckList preenchida em papel ou planilhas soltas
@@ -35,8 +33,6 @@ ___
 
 A inspeção é a **avaliação** que o supervisor faz **durante a visita** a uma loja. Ela segue sempre a mesma lista de ponto a verificar, chamada de checklist.
 
-![[inspecao.png]]
-
 #### Pessoas e perfis
 
 - ###### Gerente da loja *(não tem acesso ao sistema)*
@@ -53,5 +49,3 @@ A inspeção é a **avaliação** que o supervisor faz **durante a visita** a um
 | Criar inspeção                                |         ==🟢Sim==         |      -      |        -        |
 | Editar ou concluir inspeção em rascunho       |   ==🟠só as que criou==   |      -      |        -        |
 | Manter cadastros e reabrir inspeção concluída |             -             |      -      | Sim ==🟣bônus== |
-
-

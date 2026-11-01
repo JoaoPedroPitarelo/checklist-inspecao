@@ -1,7 +1,7 @@
 using System.Globalization;
 using ChecklistInspecao.Web.Models;
 
-namespace ChecklistInspecao.Web.services;
+namespace ChecklistInspecao.Web.Services;
 
 public static class PercentualRealizacao
 {

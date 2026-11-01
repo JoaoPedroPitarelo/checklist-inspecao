@@ -1,6 +1,6 @@
 using ChecklistInspecao.Web.Data;
 using ChecklistInspecao.Web.Models;
-using ChecklistInspecao.Web.services;
+using ChecklistInspecao.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

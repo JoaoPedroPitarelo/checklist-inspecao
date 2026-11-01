@@ -2,7 +2,7 @@ using System.Security.Claims;
 using ChecklistInspecao.Web.Data;
 using ChecklistInspecao.Web.Models;
 
-namespace ChecklistInspecao.Web.services;
+namespace ChecklistInspecao.Web.Services;
 
 public class UsuarioAtual
 {

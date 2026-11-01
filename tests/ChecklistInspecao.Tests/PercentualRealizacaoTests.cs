@@ -1,5 +1,5 @@
 using ChecklistInspecao.Web.Models;
-using ChecklistInspecao.Web.services;
+using ChecklistInspecao.Web.Services;
 
 namespace ChecklistInspecao.Tests;
 

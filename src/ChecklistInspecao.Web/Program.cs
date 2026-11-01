@@ -2,7 +2,7 @@ using Npgsql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ChecklistInspecao.Web.Data;
-using ChecklistInspecao.Web.services;
+using ChecklistInspecao.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
