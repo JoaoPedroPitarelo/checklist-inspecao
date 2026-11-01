@@ -9,42 +9,51 @@
     <link rel="stylesheet" href="~/ChecklistInspecao.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var paginaAtual = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    }
     <header class="d-print-none">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">PassoCerto - Checklist Inspeção</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Lojas/Index">Lojas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Inspecoes/Index">Histórico</a>
-                        </li>
-                        @if (User.IsInRole(Perfis.Supervisor))
-                        {
+                <a class="navbar-brand fw-semibold" asp-area="" asp-page="/Index">PassoCerto - Checklist Inspeção</a>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Abrir menu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Inspecoes/Criar">Nova inspeção</a>
+                                <a class="nav-link @(paginaAtual == "/Index" ? "active" : "")"
+                                asp-area="" asp-page="/Index">Dashboard</a>
                             </li>
-                        }
-                    </ul>
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
+                            <li class="nav-item">
+                                <a class="nav-link @(paginaAtual.StartsWith("/Lojas") ? "active" : "")"
+                                asp-area="" asp-page="/Lojas/Index">Lojas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(paginaAtual is "/Inspecoes/Index" or "/Inspecoes/Detalhe" or "/Inspecoes/Preencher" ? "active" : "")"
+                                asp-area="" asp-page="/Inspecoes/Index">Histórico</a>
+                            </li>
+                            @if (User.IsInRole(Perfis.Supervisor))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(paginaAtual == "/Inspecoes/Criar" ? "active" : "")"
+                                    asp-area="" asp-page="/Inspecoes/Criar">Nova inspeção</a>
+                                </li>
+                            }
+                        </ul>
+
                         <div class="d-flex align-items-center gap-3">
                             <span class="navbar-text">@User.Identity.Name</span>
                             <form method="post" asp-page="/Logout" class="m-0">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm">Sair</button>
+                                <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
                             </form>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </nav>
     </header>
