@@ -120,6 +120,18 @@ Acesse **http://localhost:5121** e entre com um dos usuários abaixo.
 
 ---
 
+### 5. Executar os testes
+
+Na raiz do repositório:
+
+```bash
+dotnet test
+```
+
+Os testes ficam em [`tests/ChecklistInspecao.Tests`](tests/ChecklistInspecao.Tests) e cobrem as regras isoladas em `Services/`.
+
+---
+
 ## Usuários de teste
 
 Todos os usuário tem usam a senha **`Prova@123`**.
@@ -243,13 +255,13 @@ Pontos principais:
 
 ---
 
-## Melhorias que faria
+## Melhorias futuras
 
 - **Segurança:** mover a string de conexão para *user secrets* ou variável de ambiente; validar se o usuário continua ativo a cada requisição (`OnValidatePrincipal`); limitar tentativas de login.
-- **Testes:** testes de integração dos repositórios com um PostgreSQL real (Testcontainers).
-- **Banco:** versionar a evolução do schema com uma ferramenta de migrations em SQL puro (DbUp ou Flyway); revisar índices compostos conforme o volume crescer.
-- **Usabilidade:** filtro de loja dependente da região escolhida; atalho "Meus rascunhos" para o supervisor; autosave do rascunho durante o preenchimento.
-- **Funcionalidades:** os bônus não implementados (cadastros do Administrador, plano de ação, fotos por item, evolução histórica, exportação).
+- **Testes:** testes de integração dos repositórios com um PostgreSQL real.
+- **Usabilidade:** modo escuro, migrando do Bootstrap 5.1 (que veio com o template) para o 5.3, que tem *color modes* nativos (`data-bs-theme`), com alternância salva no navegador e respeitando a preferência do sistema operacional; filtro de loja dependente da região escolhida; atalho "Meus rascunhos" para o supervisor; autosave do rascunho durante o preenchimento.
+- **Banco:** versionar a evolução do schema com uma ferramenta de migrations em SQL puro (DbUp ou Flyway);
+- **Funcionalidades:** os bônus não implementados (cadastros do Administrador, plano de ação, fotos por item, evolução histórica).
 
 ---
 
@@ -268,7 +280,8 @@ checklist-inspecao/
 │   │   ├── Lojas/        Listagem de lojas
 │   │   ├── Index         Dashboard
 │   │   └── Login, Logout, AcessoNegado
-│   └── Program.cs        Configuração: banco, autenticação, injeção de dependência
+│   └── Program.cs                   Configurações do projeto
+├── tests/ChecklistInspecao.Tests/   Testes unitários (xUnit)
 ├── docker-compose.yml
 └── global.json
 ```
