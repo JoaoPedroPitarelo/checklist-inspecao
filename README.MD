@@ -54,21 +54,36 @@ Os scripts ficam em [`database/`](database/) e devem rodar **nesta ordem**:
 
 | Script                  | Conteúdo                                                                                   |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
-| `schema.sql`            | Criação das tabelas e restrições                                                           |
-| `seed.sql`              | Dados iniciais: regiões, lojas, gerentes, usuários e itens do checklist                    |
-| `dashboard_records.sql` | 28 inspeções de exemplo (opcional, mas recomendado para avaliar o histórico e o dashboard) |
+| `01_schema.sql`            | Criação das tabelas e restrições                                                           |
+| `02_seed.sql`              | Dados iniciais: regiões, lojas, gerentes, usuários e itens do checklist                    |
+| `03_dashboard_records.sql` | 28 inspeções de exemplo (opcional, mas recomendado para avaliar o histórico e o dashboard) |
 
-#### Opção A: com Docker (recomendado)
+#### Opção A: com Docker / Podman (recomendado)
 
+Na raiz do projeto:
 ```bash
-docker compose up -d
-```
+# Podman
+podman compose up -d
 
+# Docker
+docker compose up -d
+
+```
 O container sobe o PostgreSQL 16 e executa os três scripts automaticamente na primeira inicialização.
+
+> **Sobre o Podman:** o projeto foi desenvolvido com o [Podman](https://podman.io/), uma alternativa
+> ao Docker que roda os containers sem um daemon e sem exigir privilégios de root (rootless), mais integrado a ambientes Linux.
+>
+> A linha de comando e o formato do `docker-compose.yml` são compatíveis, então o mesmo arquivo
+> funciona nos dois. Com o Podman, o `compose` requer `podman-compose` instalado.
 
 Para recriar o banco do zero (apaga todos os dados):
 
 ```bash
+# Podman
+podman compose down -v && podman compose up -d
+
+# Docker
 docker compose down -v && docker compose up -d
 ```
 
@@ -83,7 +98,6 @@ psql -U checklist -d checklist -h localhost -f database/seed.sql
 psql -U checklist -d checklist -h localhost -f database/dashboard_records.sql
 ```
 
-O `seed.sql` usa a extensão `pgcrypto` para gerar o hash das senhas. Ela é uma extensão confiável a partir do PostgreSQL 13, então o dono do banco consegue criá-la sem ser sudo.
 
 ### 3. Configurar a string de conexão
 
@@ -131,9 +145,6 @@ Logo após a carga dos três scripts, o dashboard de `helena.prado` com o perío
 | Itens | OK 106, Pendentes 26, N/A 3 |
 | Não inspecionadas | 303 Outlet, 104 Orla, 202 Terminal |
 
-As respostas do script de exemplo são geradas de forma determinística a partir do número da loja e de quantos dias atrás foi a visita, então esses valores são os mesmos em qualquer dia em que o script for executado.
-
-A loja 202 é um caso proposital: tem um rascunho no período, mas continua "não inspecionada", porque rascunhos não contam nos indicadores (RN10 e RN12).
 
 ---
 
