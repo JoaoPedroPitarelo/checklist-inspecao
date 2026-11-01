@@ -73,15 +73,15 @@ FROM (
            END AS resposta
     FROM exemplo_inspecao e
     JOIN inspecao       i  ON i.id = e.id
+    JOIN loja           lj ON lj.id = i.loja_id
     JOIN regiao         r  ON r.id = i.regiao_id
     CROSS JOIN item_checklist it
     JOIN categoria      c  ON c.id = it.categoria_id
     CROSS JOIN LATERAL (
-        SELECT abs(hashtext(i.loja_id || '-' || i.data_visita || '-' || it.ordem)) % 100 AS valor
+        SELECT abs(hashtext(lj.numero || '-' || (current_date - i.data_visita) || '-' || it.ordem)) % 100 AS valor
     ) h
     WHERE it.ativo AND c.ativo
 ) x;
-
 
 UPDATE inspecao i
 SET percentual     = round(100.0 * s.ok / NULLIF(s.ok + s.pendentes, 0), 2),

@@ -26,6 +26,7 @@ builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<LojaRepository>();
 builder.Services.AddScoped<InspecaoRepository>();
 builder.Services.AddScoped<RegiaoRepository>();
+builder.Services.AddScoped<DashboardRepository>();
 
 // Serviço do usuário logodo
 builder.Services.AddHttpContextAccessor();

@@ -1,10 +1,97 @@
 ﻿@page
-@model IndexModel
+@model ChecklistInspecao.Web.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Dashboard";
+    var resumo = Model.Resumo;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1 class="h3 mb-3">Dashboard</h1>
+
+<form method="get" class="card card-body mb-3">
+    <div class="row g-2">
+        <div class="col-6 col-md-3">
+            <label asp-for="DataInicio" class="form-label small mb-1">De</label>
+            <input asp-for="DataInicio" class="form-control form-control-sm" />
+        </div>
+        <div class="col-6 col-md-3">
+            <label asp-for="DataFim" class="form-label small mb-1">Até</label>
+            <input asp-for="DataFim" class="form-control form-control-sm" />
+        </div>
+        <div class="col-12 col-md-3">
+            <label asp-for="RegiaoId" class="form-label small mb-1">Região</label>
+            <select asp-for="RegiaoId" class="form-select form-select-sm">
+                <option value="">Todas</option>
+                @foreach (var regiao in Model.Regioes)
+                {
+                    <option value="@regiao.Id">@regiao.Nome</option>
+                }
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <label asp-for="LojaId" class="form-label small mb-1">Loja</label>
+            <select asp-for="LojaId" class="form-select form-select-sm">
+                <option value="">Todas</option>
+                @foreach (var loja in Model.Lojas)
+                {
+                    <option value="@loja.Id">@loja.Numero - @loja.Nome</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <span asp-validation-for="DataFim" class="text-danger small mt-2"></span>
+
+    <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <a asp-page="/Index" class="btn btn-outline-secondary btn-sm">Limpar</a>
+    </div>
+</form>
+
+<p class="text-muted small mb-3">
+    Indicadores calculados apenas com inspeções concluídas, pela data da visita.
+</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="small text-muted">Inspeções</div>
+                <div class="h3 mb-1">@resumo.TotalInspecoes</div>
+                <div class="small">@resumo.Concluidas concluídas · @resumo.Rascunhos em rascunho</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="small text-muted">Percentual médio</div>
+                <div class="h3 mb-1">@PercentualRealizacao.Formatar(resumo.PercentualMedio)</div>
+                <div class="small">média simples das concluídas</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="small text-muted">Lojas inspecionadas</div>
+                <div class="h3 mb-1">@resumo.LojasInspecionadas <span class="fs-6 text-muted">de @resumo.LojasAtivas</span></div>
+                <div class="small">lojas ativas no período</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="small text-muted">Itens avaliados</div>
+                <div class="small mt-1">
+                    <span class="badge bg-success">OK @resumo.ItensOk</span>
+                    <span class="badge bg-danger">Pendentes @resumo.ItensPendentes</span>
+                    <span class="badge bg-secondary">N/A @resumo.ItensNa</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
